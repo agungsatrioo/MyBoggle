@@ -12,12 +12,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -27,13 +21,14 @@ import javax.swing.JOptionPane;
  * @author agung
  */
 public class Words {
-    private static List<String> lowercase, list, list2;
-    private static ArrayList words_list = new ArrayList();
-    private static ArrayList word_submit = new ArrayList();
-    private DefaultListModel<String> submited_words = new DefaultListModel<String>();
-    private DefaultListModel<String> model = new DefaultListModel<String>();
+    private static List<String> list, list2;
+    private static final ArrayList words_list = new ArrayList();
+    private DefaultListModel<String> submited_words = new DefaultListModel<>();
+    private DefaultListModel<String> model = new DefaultListModel<>();
     private static int score=0;
     private static int i=0;
+    
+    private static List<List<String>> lists;
     
     private final static int MIN_CHAR = 3;
     private final static int MAX_CHAR = 15;
@@ -44,27 +39,18 @@ public class Words {
         try {
             score=0;
             
+            list = new ArrayList<>();
+            
             System.out.printf("Combination for: %s\n",current);
             
-            //These are file used to
-            File f = new File(getClass().getResource("dict_nos.txt").toURI());
-            File g = new File(getClass().getResource("dict_medium.txt").toURI());
+            String[] file_name = {"dict_nos.txt","dict_medium.txt"};
             
-            /*File f = new File(path+"dict_nos.txt");
-            File g = new File(path+"dict_medium.txt");
-            */
-            
-            if(list!=null) list.clear();
-            if(list2!=null) list2.clear();
-            model.clear();
-            
-            list = Files.readAllLines(f.toPath());
-            list2 = Files.readAllLines(g.toPath());
-            
-            list = list.stream().map( s -> s.toLowerCase() ).filter( s->s.chars().allMatch(Character::isLetter)).collect( Collectors.toList() );
-            list2 = list.stream().map( s -> s.toLowerCase() ).filter( s->s.chars().allMatch(Character::isLetter)).collect( Collectors.toList() );
-            
-            list.addAll(list2);
+            for(String fn: file_name) {
+                File f_tmp = new File(getClass().getResource(fn).toURI());
+                List<String> wordListTemp = Files.readAllLines(f_tmp.toPath(),Charset.forName("utf-8"));
+                wordListTemp = wordListTemp.stream().map(s -> s.toLowerCase()).filter( s->s.chars().allMatch(Character::isLetter)).collect( Collectors.toList());
+                list.addAll(wordListTemp);
+            }
             
             list = list.stream().distinct().collect(Collectors.toList());
             
@@ -73,6 +59,9 @@ public class Words {
             findOptions(current, list );
         } catch (IOException ex) {
             infoBox("Dictionary not found","Error");
+            System.exit(0);
+        } catch (NullPointerException e) {
+            infoBox("Null!","Error");
             System.exit(0);
         }
     }
