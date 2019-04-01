@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -21,7 +22,7 @@ import javax.swing.JOptionPane;
  * @author agung
  */
 public class Words {
-    private static List<String> list, list2;
+    private static List<String> list;
     private static final ArrayList words_list = new ArrayList();
     private DefaultListModel<String> submited_words = new DefaultListModel<>();
     private DefaultListModel<String> model = new DefaultListModel<>();
@@ -56,7 +57,9 @@ public class Words {
             
             list.sort((o1, o2) -> o1.compareTo(o2));
             
-            findOptions(current, list );
+            findOptions(current, list);
+            
+            list.clear();
         } catch (IOException ex) {
             infoBox("Dictionary not found","Error");
             System.exit(0);
@@ -66,25 +69,25 @@ public class Words {
         }
     }
     
-    public static void infoBox(String infoMessage, String titleBar)
-    {
+    public static void infoBox(String infoMessage, String titleBar) {
         JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + titleBar, JOptionPane.INFORMATION_MESSAGE);
     }
 
     private static void findOptions( String string, List<String> list ){
         int[] freq = toFreq(string.toLowerCase());
         
-        list.forEach((String l) -> {
-            int[] freqIn = toFreq(l);
+        list.forEach((String word) -> {
+            int[] freqIn = toFreq(word);
             if (matches(freq, freqIn)) {
-                if(l.length()>=MIN_CHAR && l.length()<=MAX_CHAR) {
+                if(word.length()>=MIN_CHAR && word.length()<=MAX_CHAR) {
                     if(i%20==0) System.out.println();
-                    System.out.print(l+", ");
-                    words_list.add(l);
+                    System.out.print(word+", ");
+                    words_list.add(word);
                     i++;
                 }
             }
         });
+        
         System.out.println();
     }
 
@@ -103,7 +106,7 @@ public class Words {
     }
 
     /**
-     * Encode a word in to a frequency array. int[0] = #a's, int[1] = #b's etc.
+     * Membuat array distribusi jumlah huruf dari kata masukan.
      * 
      * @param string
      * @return
